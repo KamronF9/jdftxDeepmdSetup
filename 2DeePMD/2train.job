@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH -A xxxx
+#SBATCH -C gpu
+#SBATCH -q regular_ss11
+#SBATCH -t 4:00:00  
+#SBATCH -N 1
+#SBATCH -o train.o%j
+
+#7min 7:00
+#trainDmd.job
+
+#export SLURM_CPU_BIND="cores"
+
+
+echo "STARTING"
+dp train input.json
+echo 'DONE RUNNING!!'

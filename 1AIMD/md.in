@@ -1,0 +1,27 @@
+coords-type Cartesian
+include md.lattice
+include md.ionpos
+
+ion-species GBRV/$ID_pbe.uspp
+elec-cutoff 20 100
+van-der-waals D3
+
+dump-name md.$VAR
+dump Ionic Lattice IonicPositions
+
+elec-smearing Gauss 0.005
+lcao-params 50
+
+electronic-scf energyDiffThreshold 1e-7 nIterations 30
+
+core-overlap-check none
+
+ionic-dynamics \
+	dt 1. \
+	nSteps 2000 \
+	tDampT 100. \
+	tDampP 200. \
+	T0 1500 \
+	P0 1. \
+	statMethod NoseHoover
+

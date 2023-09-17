@@ -1,0 +1,55 @@
+# NaCl test simulation
+# rocksalt structure at 0.7 homologous temperature
+# Born-Mayer-Huggins potential described in (Fumi and Tosi)
+
+log	       lq1.log
+units          metal
+atom_style     charge
+boundary       p p p
+
+# Na atoms lattice
+# LQ test conditions - 1300K, 1 bar
+
+lattice         fcc 5.627
+region          box block 0 5 0 5 0 5
+create_box      2 box
+create_atoms    1 box
+
+# Cl atoms lattice
+lattice         fcc 5.627 origin 0.5 0.0 0.0
+create_atoms    2 box
+
+group          Cl type 1
+group          Na type 2
+
+mass           1 35.452700 # Cl
+mass           2 22.989800 # Na
+
+set group      Cl charge -1
+set group      Na charge +1
+
+plugin load libdeepmd_lmp.so
+pair_style  deepmd ${pot}
+pair_coeff  * *
+
+
+thermo          100
+thermo_style    custom step pe vol press temp 
+thermo_modify	norm no
+
+# thermo_style  multi
+
+velocity        all create 3000.00 1234
+
+timestep        0.002 # 2 fs
+dump		0 all custom 100 lq1.dump id type x y z fx fy fz
+# high T randomization and cooling
+fix		1 all nvt temp 3000. 1300. $(40.0*dt) 
+run		5000 # 30ps
+unfix		1
+# NPT data collection from here
+fix		1 all npt temp 1300. 1300. $(40.0*dt) iso 1. 1. $(100.0*dt)
+#reset_timestep  0
+#dump		0 all custom 100 lq1.dump id type x y z fx fy fz
+run		25000 # 50ps
+
